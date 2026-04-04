@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Container
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: smartbus-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: smartbus_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: # This ensures your DB data isn't deleted if the container stops

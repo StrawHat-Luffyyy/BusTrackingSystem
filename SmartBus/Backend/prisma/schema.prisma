@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  COMMUTER
+  OPERATOR
+  ADMIN
+}
+
+enum BusType {
+  AC
+  NON_AC
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(COMMUTER)
+  phoneNumber  String?
+  createdAt    DateTime @default(now())
+
+  buses    Bus[] // Relation for Operators
+  bookings Booking[] // Relation for Commuters
+}
+
+model Bus {
+  id             Int     @id @default(autoincrement())
+  operatorId     Int
+  registrationNo String  @unique
+  totalSeats     Int
+  busType        BusType
+  isActive       Boolean @default(true)
+
+  operator User   @relation(fields: [operatorId], references: [id])
+  trips    Trip[]
+}
+
+model Route {
+  id          Int    @id @default(autoincrement())
+  routeName   String
+  origin      String
+  destination String
+  distanceKm  Float?
+
+  trips Trip[]
+
+  @@index([origin, destination])
+}
+
+model Trip {
+  id            Int      @id @default(autoincrement())
+  busId         Int
+  routeId       Int
+  departureTime DateTime
+  arrivalTime   DateTime
+  fare          Float
+
+  bus      Bus       @relation(fields: [busId], references: [id])
+  route    Route     @relation(fields: [routeId], references: [id])
+  bookings Booking[]
+
+  @@index([departureTime])
+}
+
+model Booking {
+  id          Int           @id @default(autoincrement())
+  userId      Int
+  tripId      Int
+  seatNumbers String
+  status      BookingStatus @default(CONFIRMED)
+  bookedAt    DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id])
+}
