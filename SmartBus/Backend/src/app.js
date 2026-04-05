@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import tripRoutes from './routes/tripRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 const app = express();
 
 app.use(helmet());
@@ -28,6 +29,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/admin', adminRoutes);
 
 // --- 404 Handler ---
 app.use((req, res, next) => {
