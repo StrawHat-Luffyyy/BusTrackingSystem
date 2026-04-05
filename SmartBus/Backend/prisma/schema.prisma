@@ -43,6 +43,7 @@ model Bus {
   totalSeats     Int
   busType        BusType
   isActive       Boolean @default(true)
+  imageUrl       String?
 
   operator User   @relation(fields: [operatorId], references: [id])
   trips    Trip[]

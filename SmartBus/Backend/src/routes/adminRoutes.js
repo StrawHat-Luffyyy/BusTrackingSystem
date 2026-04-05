@@ -1,6 +1,7 @@
 import express from 'express';
 import { createRoute, createBus, createTrip } from '../controllers/adminController.js';
 import { protect, restrictTo } from '../middlewares/authMiddleware.js';
+import { upload } from '../utils/s3Upload.js';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.use(restrictTo('ADMIN', 'OPERATOR'));
 
 // If you pass both barriers, you can access these routes:
 router.post('/routes', createRoute);
-router.post('/buses', createBus);
+router.post('/buses', upload.single('photo'), createBus);
 router.post('/trips', createTrip);
 
 export default router;
