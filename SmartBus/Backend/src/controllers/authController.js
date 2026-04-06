@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { prisma } from "../server.js";
+import { prisma } from "../prismaClient.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/AppError.js";
 import { sendTokenResponse } from "../utils/jwt.js";

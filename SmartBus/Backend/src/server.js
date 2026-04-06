@@ -1,12 +1,6 @@
 import "dotenv/config";
 import app from "./app.js";
-import prismaPkg from "./generated/prisma/index.js";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const { PrismaClient } = prismaPkg;
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+import { prisma } from "./prismaClient.js";
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
@@ -14,7 +8,7 @@ async function startServer() {
     await prisma.$connect();
     console.log("Connected to PostgreSQL database successfully.");
 
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, "0.0.0.0",() => {
       console.log(`SmartBus API is running on http://localhost:${PORT}`);
     });
 
