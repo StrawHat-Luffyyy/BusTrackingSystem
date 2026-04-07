@@ -1,4 +1,4 @@
-import { prisma } from "../server.js";
+import { prisma } from "../prismaClient.js";
 import catchAsync from "../utils/catchAsync.js";
 
 export const searchTrips = catchAsync(async (req, res, next) => {

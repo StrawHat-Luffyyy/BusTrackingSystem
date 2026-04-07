@@ -2,12 +2,18 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+import path from "path";
+import { fileURLToPath } from "url";
 import authRoutes from "./routes/authRoutes.js";
-import tripRoutes from './routes/tripRoutes.js';
-import bookingRoutes from './routes/bookingRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
+import tripRoutes from "./routes/tripRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 app.use(helmet());
 app.use(
   cors({
@@ -17,6 +23,11 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+// Load the YAML file
+const swaggerDocument = YAML.load(path.join(__dirname, "../docs/swagger.yaml"));
+
+// Serve the interactive documentation UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({
@@ -27,9 +38,9 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use('/api/trips', tripRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/admin', adminRoutes);
+app.use("/api/trips", tripRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/admin", adminRoutes);
 
 // --- 404 Handler ---
 app.use((req, res, next) => {

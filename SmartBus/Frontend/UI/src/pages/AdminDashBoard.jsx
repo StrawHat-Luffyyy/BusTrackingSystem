@@ -23,12 +23,9 @@ const AdminDashboard = () => {
     fare: "",
   });
 
-  // --- Submit Handlers ---
-  // In a real app, these would make Axios POST requests to your new secure backend APIs
   const handleBusSubmit = (e) => {
     e.preventDefault();
     console.log("Submitting Bus:", busData);
-    // await axios.post('/api/admin/buses', busData, { withCredentials: true })
     alert("Bus created successfully!");
     setBusData({ registrationNo: "", totalSeats: "", busType: "AC" });
   };
@@ -54,96 +51,76 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
-      {/* --- Sidebar Navigation --- */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-2 h-fit">
-        <h2 className="text-xl font-bold text-gray-800 mb-4 px-2">
-          Operator Panel
-        </h2>
+    <div className="page-container">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <h2 style={{ padding: '0 1rem', marginBottom: '1rem', marginTop: 0 }}>Operator Panel</h2>
 
         <button
           onClick={() => setActiveTab("buses")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === "buses" ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"}`}
+          className={`tab-btn ${activeTab === "buses" ? "active" : ""}`}
         >
-          <Bus className="w-5 h-5" /> Manage Buses
+          <Bus size={20} /> Manage Buses
         </button>
 
         <button
           onClick={() => setActiveTab("routes")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === "routes" ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"}`}
+          className={`tab-btn ${activeTab === "routes" ? "active" : ""}`}
         >
-          <Map className="w-5 h-5" /> Manage Routes
+          <Map size={20} /> Manage Routes
         </button>
 
         <button
           onClick={() => setActiveTab("trips")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${activeTab === "trips" ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50"}`}
+          className={`tab-btn ${activeTab === "trips" ? "active" : ""}`}
         >
-          <CalendarClock className="w-5 h-5" /> Schedule Trips
+          <CalendarClock size={20} /> Schedule Trips
         </button>
       </div>
 
-      {/* --- Main Content Area --- */}
-      <div className="md:col-span-3 bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
+      {/* Main Content */}
+      <div className="main-card">
         {/* BUS TAB */}
         {activeTab === "buses" && (
           <div>
-            <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Bus className="text-blue-600" /> Register New Bus
+            <h3 className="section-title">
+              <Bus color="var(--accent-blue)" /> Register New Bus
             </h3>
-            <form onSubmit={handleBusSubmit} className="space-y-4 max-w-md">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Registration Number
-                </label>
+            <form onSubmit={handleBusSubmit}>
+              <div className="form-group" style={{ maxWidth: '400px' }}>
+                <label>Registration Number</label>
                 <input
                   required
                   type="text"
                   placeholder="GJ-01-AB-1234"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={busData.registrationNo}
-                  onChange={(e) =>
-                    setBusData({ ...busData, registrationNo: e.target.value })
-                  }
+                  onChange={(e) => setBusData({ ...busData, registrationNo: e.target.value })}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total Seats
-                  </label>
+              <div className="form-grid" style={{ maxWidth: '400px' }}>
+                <div className="form-group">
+                  <label>Total Seats</label>
                   <input
                     required
                     type="number"
                     placeholder="40"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                     value={busData.totalSeats}
-                    onChange={(e) =>
-                      setBusData({ ...busData, totalSeats: e.target.value })
-                    }
+                    onChange={(e) => setBusData({ ...busData, totalSeats: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bus Type
-                  </label>
+                <div className="form-group">
+                  <label>Bus Type</label>
                   <select
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                     value={busData.busType}
-                    onChange={(e) =>
-                      setBusData({ ...busData, busType: e.target.value })
-                    }
+                    onChange={(e) => setBusData({ ...busData, busType: e.target.value })}
                   >
                     <option value="AC">AC</option>
                     <option value="NON_AC">Non-AC</option>
                   </select>
                 </div>
               </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2"
-              >
-                <PlusCircle className="w-5 h-5" /> Save Bus
+              <button type="submit" className="primary-btn" style={{ maxWidth: '400px' }}>
+                <PlusCircle size={20} /> Save Bus
               </button>
             </form>
           </div>
@@ -152,59 +129,41 @@ const AdminDashboard = () => {
         {/* ROUTE TAB */}
         {activeTab === "routes" && (
           <div>
-            <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Map className="text-blue-600" /> Create New Route
+            <h3 className="section-title">
+              <Map color="var(--accent-orange)" /> Create New Route
             </h3>
-            <form onSubmit={handleRouteSubmit} className="space-y-4 max-w-md">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Origin City
-                </label>
+            <form onSubmit={handleRouteSubmit} style={{ maxWidth: '400px' }}>
+              <div className="form-group">
+                <label>Origin City</label>
                 <input
                   required
                   type="text"
                   placeholder="e.g., Ahmedabad"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={routeData.origin}
-                  onChange={(e) =>
-                    setRouteData({ ...routeData, origin: e.target.value })
-                  }
+                  onChange={(e) => setRouteData({ ...routeData, origin: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Destination City
-                </label>
+              <div className="form-group">
+                <label>Destination City</label>
                 <input
                   required
                   type="text"
                   placeholder="e.g., Surat"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={routeData.destination}
-                  onChange={(e) =>
-                    setRouteData({ ...routeData, destination: e.target.value })
-                  }
+                  onChange={(e) => setRouteData({ ...routeData, destination: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Distance (Km)
-                </label>
+              <div className="form-group">
+                <label>Distance (Km)</label>
                 <input
                   type="number"
                   placeholder="265"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={routeData.distanceKm}
-                  onChange={(e) =>
-                    setRouteData({ ...routeData, distanceKm: e.target.value })
-                  }
+                  onChange={(e) => setRouteData({ ...routeData, distanceKm: e.target.value })}
                 />
               </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2"
-              >
-                <PlusCircle className="w-5 h-5" /> Save Route
+              <button type="submit" className="primary-btn">
+                <PlusCircle size={20} /> Save Route
               </button>
             </form>
           </div>
@@ -213,92 +172,63 @@ const AdminDashboard = () => {
         {/* TRIP TAB */}
         {activeTab === "trips" && (
           <div>
-            <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <CalendarClock className="text-blue-600" /> Schedule a Trip
+            <h3 className="section-title">
+              <CalendarClock color="var(--accent-pink)" /> Schedule a Trip
             </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              In a full production environment, the Bus ID and Route ID would be
-              searchable dropdowns populated from the database.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+              In a full production environment, the Bus ID and Route ID would be searchable dropdowns.
             </p>
-            <form onSubmit={handleTripSubmit} className="space-y-4 max-w-md">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bus ID
-                  </label>
+            <form onSubmit={handleTripSubmit} style={{ maxWidth: '400px' }}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Bus ID</label>
                   <input
                     required
                     type="number"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                     value={tripData.busId}
-                    onChange={(e) =>
-                      setTripData({ ...tripData, busId: e.target.value })
-                    }
+                    onChange={(e) => setTripData({ ...tripData, busId: e.target.value })}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Route ID
-                  </label>
+                <div className="form-group">
+                  <label>Route ID</label>
                   <input
                     required
                     type="number"
-                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                     value={tripData.routeId}
-                    onChange={(e) =>
-                      setTripData({ ...tripData, routeId: e.target.value })
-                    }
+                    onChange={(e) => setTripData({ ...tripData, routeId: e.target.value })}
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Departure Time
-                </label>
+              <div className="form-group">
+                <label>Departure Time</label>
                 <input
                   required
                   type="datetime-local"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={tripData.departureTime}
-                  onChange={(e) =>
-                    setTripData({ ...tripData, departureTime: e.target.value })
-                  }
+                  onChange={(e) => setTripData({ ...tripData, departureTime: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Arrival Time
-                </label>
+              <div className="form-group">
+                <label>Arrival Time</label>
                 <input
                   required
                   type="datetime-local"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={tripData.arrivalTime}
-                  onChange={(e) =>
-                    setTripData({ ...tripData, arrivalTime: e.target.value })
-                  }
+                  onChange={(e) => setTripData({ ...tripData, arrivalTime: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ticket Fare (₹)
-                </label>
+              <div className="form-group">
+                <label>Ticket Fare (₹)</label>
                 <input
                   required
                   type="number"
                   step="0.01"
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-600"
                   value={tripData.fare}
-                  onChange={(e) =>
-                    setTripData({ ...tripData, fare: e.target.value })
-                  }
+                  onChange={(e) => setTripData({ ...tripData, fare: e.target.value })}
                 />
               </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2"
-              >
-                <PlusCircle className="w-5 h-5" /> Schedule Trip
+              <button type="submit" className="primary-btn">
+                <PlusCircle size={20} /> Schedule Trip
               </button>
             </form>
           </div>

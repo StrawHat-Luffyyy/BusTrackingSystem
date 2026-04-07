@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: SmartBus API
+  description: City Bus Tracking & Seat Booking System API Documentation
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+    description: Local Development Server
+  - url: http://YOUR_EC2_PUBLIC_IP:5000/api
+    description: Production Server
+
+# Define our JWT Cookie security globally
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt
+
+paths:
+  /auth/login:
+    post:
+      summary: Login a user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: commuter@test.com
+                password:
+                  type: string
+                  example: secret123
+      responses:
+        '200':
+          description: Successful login, sets JWT cookie.
+
+  /trips/search:
+    get:
+      summary: Search for available buses
+      tags: [Trips]
+      parameters:
+        - in: query
+          name: origin
+          schema:
+            type: string
+          description: Origin city
+        - in: query
+          name: destination
+          schema:
+            type: string
+          description: Destination city
+      responses:
+        '200':
+          description: Returns an array of trips.
+
+  /bookings:
+    post:
+      summary: Book seats on a trip
+      tags: [Bookings]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tripId:
+                  type: integer
+                  example: 1
+                seatNumbers:
+                  type: string
+                  example: "12, 13"
+      responses:
+        '201':
+          description: Booking created successfully.
+        '401':
+          description: Unauthorized. Please log in.
+
+  /admin/buses:
+    post:
+      summary: Register a new bus (Admin/Operator only)
+      tags: [Admin]
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                registrationNo:
+                  type: string
+                  example: GJ-01-AB-1234
+                totalSeats:
+                  type: integer
+                  example: 40
+                busType:
+                  type: string
+                  example: AC
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Bus registered successfully.
+        '403':
+          description: Forbidden. Insufficient permissions.
