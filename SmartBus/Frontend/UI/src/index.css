@@ -29,6 +29,10 @@ body {
 .app-frame {
   margin: 1rem;
   background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(112, 214, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(255, 133, 179, 0.08), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(255, 107, 53, 0.05), transparent 50%);
   min-height: calc(100vh - 2rem);
   border-radius: 8px;
   position: relative;
@@ -255,4 +259,41 @@ body {
 .search-btn:hover {
   transform: scale(1.05);
   background: var(--frame-color);
+}
+
+/* --- E-Ticket Print Override --- */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .app-frame {
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  .top-nav, 
+  .hide-on-print,
+  .sidebar { 
+    display: none !important; 
+  }
+
+  .printable-container {
+    padding: 0 !important;
+  }
+
+  .printable-card {
+    border: 2px solid #000 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Since native bg-colors vanish on pure print, we forcefully preserve color */
+  .printable-layer {
+    background-color: #f9f9f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

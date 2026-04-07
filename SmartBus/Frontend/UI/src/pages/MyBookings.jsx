@@ -29,13 +29,13 @@ const MyBookings = () => {
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: 'auto', padding: '2rem' }}>
-      <h1 className="section-title">
+    <div style={{ maxWidth: '1000px', margin: 'auto', padding: '4rem 2rem' }} className="printable-container">
+      <h1 className="section-title hide-on-print">
         <Ticket color="var(--accent-pink)" size={36} /> My Trips
       </h1>
 
       {bookings.length === 0 ? (
-        <div className="empty-state">
+        <div className="empty-state hide-on-print">
           <p style={{ color: 'var(--text-muted)' }}>You haven't booked any trips yet.</p>
           <button className="primary-btn" style={{ maxWidth: '200px', margin: '1rem auto' }}>
             Find a Bus
@@ -47,8 +47,8 @@ const MyBookings = () => {
             const depDate = new Date(booking.trip.departureTime);
 
             return (
-              <div key={booking.id} className="ticket-card">
-                <div className="ticket-left">
+              <div key={booking.id} className="ticket-card printable-card">
+                <div className="ticket-left printable-layer">
                   <span className={`status-badge ${booking.status === "CONFIRMED" ? "confirmed" : ""}`}>
                     {booking.status}
                   </span>
@@ -62,7 +62,7 @@ const MyBookings = () => {
                   </div>
                 </div>
 
-                <div className="ticket-right">
+                <div className="ticket-right printable-layer">
                   <div className="grid-details">
                     <div className="detail-item">
                       <p>Date</p>
@@ -82,14 +82,14 @@ const MyBookings = () => {
                     </div>
                   </div>
 
-                  <div className="ticket-action">
+                  <div className="ticket-action hide-on-print">
                     <div>
                       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Total Paid</p>
                       <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
                         ₹{(booking.trip.fare * booking.seatNumbers.split(",").length).toFixed(2)}
                       </p>
                     </div>
-                    <button><Download size={14} style={{ marginRight: '0.25rem', verticalAlign: 'middle' }} /> E-Ticket</button>
+                    <button onClick={() => window.print()}><Download size={14} style={{ marginRight: '0.25rem', verticalAlign: 'middle' }} /> E-Ticket</button>
                   </div>
                 </div>
               </div>

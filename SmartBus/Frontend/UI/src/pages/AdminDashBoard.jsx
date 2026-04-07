@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Map, Bus, CalendarClock, PlusCircle } from "lucide-react";
+import { adminService } from "../services/api";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("buses");
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
 
   // --- Form States ---
   const [busData, setBusData] = useState({
@@ -23,31 +25,45 @@ const AdminDashboard = () => {
     fare: "",
   });
 
-  const handleBusSubmit = (e) => {
+  const handleBusSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Bus:", busData);
-    alert("Bus created successfully!");
-    setBusData({ registrationNo: "", totalSeats: "", busType: "AC" });
+    try {
+      await adminService.createBus({ ...busData, totalSeats: Number(busData.totalSeats) });
+      setFeedback({ type: "success", message: "Bus Successfully Deployed to Fleet!" });
+      setBusData({ registrationNo: "", totalSeats: "", busType: "AC" });
+      setTimeout(() => setFeedback({ type: "", message: "" }), 3000);
+    } catch (err) {
+      setFeedback({ type: "error", message: err.response?.data?.message || "Failed to create bus." });
+    }
   };
 
-  const handleRouteSubmit = (e) => {
+  const handleRouteSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Route:", routeData);
-    alert("Route created successfully!");
-    setRouteData({ origin: "", destination: "", distanceKm: "" });
+    try {
+      await adminService.createRoute({ ...routeData, distanceKm: Number(routeData.distanceKm) });
+      setFeedback({ type: "success", message: "New Geographic Route Added!" });
+      setRouteData({ origin: "", destination: "", distanceKm: "" });
+      setTimeout(() => setFeedback({ type: "", message: "" }), 3000);
+    } catch (err) {
+      setFeedback({ type: "error", message: err.response?.data?.message || "Failed to create route." });
+    }
   };
 
-  const handleTripSubmit = (e) => {
+  const handleTripSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting Trip:", tripData);
-    alert("Trip scheduled successfully!");
-    setTripData({
-      busId: "",
-      routeId: "",
-      departureTime: "",
-      arrivalTime: "",
-      fare: "",
-    });
+    try {
+      await adminService.createTrip({ 
+        ...tripData, 
+        busId: Number(tripData.busId), 
+        routeId: Number(tripData.routeId), 
+        fare: Number(tripData.fare) 
+      });
+      setFeedback({ type: "success", message: "Trip Scheduled and Live in DB!" });
+      setTripData({ busId: "", routeId: "", departureTime: "", arrivalTime: "", fare: "" });
+      setTimeout(() => setFeedback({ type: "", message: "" }), 3000);
+    } catch (err) {
+      setFeedback({ type: "error", message: err.response?.data?.message || "Failed to schedule trip." });
+    }
   };
 
   return (
@@ -80,6 +96,12 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <div className="main-card">
+        {feedback.message && (
+          <div style={{ padding: '1rem', marginBottom: '1.5rem', borderRadius: '8px', color: '#000', fontWeight: 600, background: feedback.type === 'success' ? 'var(--accent-blue)' : 'var(--accent-pink)' }}>
+            {feedback.message}
+          </div>
+        )}
+        
         {/* BUS TAB */}
         {activeTab === "buses" && (
           <div>

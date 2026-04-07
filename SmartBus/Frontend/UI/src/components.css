@@ -163,7 +163,7 @@
 
 .ticket-left {
   flex: 1;
-  padding: 2rem;
+  padding: 3rem;
   background: rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
@@ -173,7 +173,7 @@
 
 .ticket-right {
   flex: 1;
-  padding: 2rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -181,13 +181,13 @@
 
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.5rem 1rem;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .status-badge.confirmed {
@@ -200,39 +200,39 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .route-info h3 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 2.2rem;
   font-weight: 700;
 }
 
 .grid-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .detail-item p:first-child {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .detail-item p:last-child {
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin: 0;
 }
 
 .ticket-action {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
