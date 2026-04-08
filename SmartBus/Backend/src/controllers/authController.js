@@ -57,3 +57,14 @@ export const logout = (req, res) => {
 
   res.status(200).json({ status: "success" });
 };
+
+export const getMe = catchAsync(async (req, res) => {
+  // `protect` middleware attaches the current user to req.user
+  const user = { ...req.user };
+  user.passwordHash = undefined;
+
+  res.status(200).json({
+    status: "success",
+    data: { user },
+  });
+});

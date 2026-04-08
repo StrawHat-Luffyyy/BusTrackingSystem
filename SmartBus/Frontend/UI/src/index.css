@@ -263,6 +263,11 @@ body {
 
 /* --- E-Ticket Print Override --- */
 @media print {
+  /* Try to reduce default print margins. (Browser headers/footers are controlled by print settings.) */
+  @page {
+    margin: 12mm;
+  }
+
   body {
     background: white !important;
     color: black !important;

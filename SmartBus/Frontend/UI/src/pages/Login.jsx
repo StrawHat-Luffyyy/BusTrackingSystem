@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { authService } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { Star, Eye, Sparkles, Smile, Sun } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 
-const Login = ({ setAuth }) => {
+const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -12,11 +13,9 @@ const Login = ({ setAuth }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await authService.login({ email, password });
-      if (res.data.status === "success") {
-        setAuth(res.data.data.user);
-        navigate("/");
-      }
+      const user = await login({ email, password });
+      if (user?.role === "ADMIN") navigate("/admin/dashboard");
+      else navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }

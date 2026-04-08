@@ -30,33 +30,99 @@ const SeatMap = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg max-w-md mx-auto border border-gray-100">
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 520,
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 16,
+        padding: "1.25rem",
+        backdropFilter: "blur(16px)",
+      }}
+    >
       {/* Legend */}
-      <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded bg-gray-200 border border-gray-300"></div>
-          <span className="text-gray-600">Available</span>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+          alignItems: "center",
+          paddingBottom: "1rem",
+          marginBottom: "1rem",
+          borderBottom: "1px solid rgba(255,255,255,0.12)",
+          fontSize: "0.8rem",
+          color: "var(--text-muted)",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{ width: 18, height: 18, borderRadius: 6, border: "1px solid rgba(255,255,255,0.18)" }} />
+          <span>Available</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded bg-blue-600 border border-blue-700"></div>
-          <span className="text-gray-600">Selected</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{ width: 18, height: 18, borderRadius: 6, background: "var(--accent-blue)" }} />
+          <span>Selected</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded bg-red-100 border border-red-300 flex items-center justify-center">
-            <User className="w-3 h-3 text-red-400" />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div
+            style={{
+              width: 18,
+              height: 18,
+              borderRadius: 6,
+              background: "rgba(255,133,179,0.18)",
+              border: "1px solid rgba(255,133,179,0.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <User size={12} color="var(--accent-pink)" />
           </div>
-          <span className="text-gray-600">Booked</span>
+          <span>Booked</span>
         </div>
       </div>
 
       {/* The Bus Layout (Assuming 2x2 seating with an aisle) */}
-      <div className="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200 mb-6 relative">
+      <div
+        style={{
+          background: "rgba(0,0,0,0.35)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: 16,
+          padding: "1rem",
+          marginBottom: "1rem",
+          position: "relative",
+        }}
+      >
         {/* Front of Bus Indicator */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 py-1 text-xs font-bold text-gray-400 uppercase tracking-widest border border-gray-200 rounded-full">
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            color: "var(--text-muted)",
+            padding: "0.25rem 0.6rem",
+            borderRadius: 999,
+            fontSize: "0.7rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
           Front
         </div>
 
-        <div className="grid grid-cols-5 gap-y-4 gap-x-2 mt-4">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: "0.6rem 0.45rem",
+            marginTop: "1rem",
+          }}
+        >
           {seats.map((seat) => {
             const isBooked = bookedSeats.includes(seat);
             const isSelected = selectedSeats.includes(seat);
@@ -65,28 +131,35 @@ const SeatMap = ({
             const isAisle = parseInt(seat) % 4 === 2;
 
             return (
-              <div key={seat} className="contents">
+              <div key={seat} style={{ display: "contents" }}>
                 <button
                   disabled={isBooked}
                   onClick={() => toggleSeat(seat)}
-                  className={`
-                    h-12 w-full rounded-t-xl rounded-b-md font-semibold transition-all duration-200
-                    flex items-center justify-center text-sm shadow-sm
-                    ${
-                      isBooked
-                        ? "bg-red-50 text-red-300 border-red-200 cursor-not-allowed"
-                        : isSelected
-                          ? "bg-blue-600 text-white border-blue-700 hover:bg-blue-700 shadow-blue-200 shadow-inner"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                    }
-                    border-2
-                  `}
+                  style={{
+                    height: 44,
+                    width: "100%",
+                    borderRadius: 12,
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    background: isBooked
+                      ? "rgba(255,133,179,0.12)"
+                      : isSelected
+                        ? "var(--accent-blue)"
+                        : "rgba(255,255,255,0.06)",
+                    color: isBooked
+                      ? "var(--text-muted)"
+                      : isSelected
+                        ? "#000"
+                        : "var(--text-main)",
+                    cursor: isBooked ? "not-allowed" : "pointer",
+                    fontWeight: 800,
+                    boxShadow: isSelected ? "0 10px 24px rgba(112,214,255,0.25)" : "none",
+                  }}
                 >
-                  {isBooked ? <User className="w-4 h-4 opacity-50" /> : seat}
+                  {isBooked ? <User size={16} color="var(--accent-pink)" /> : seat}
                 </button>
 
                 {/* Render the aisle space */}
-                {isAisle && <div className="w-full h-full"></div>}
+                {isAisle && <div />}
               </div>
             );
           })}
@@ -94,30 +167,40 @@ const SeatMap = ({
       </div>
 
       {/* Checkout Summary */}
-      <div className="bg-slate-900 text-white rounded-xl p-4 flex justify-between items-center">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "1rem",
+          alignItems: "center",
+          flexWrap: "wrap",
+          borderTop: "1px solid rgba(255,255,255,0.12)",
+          paddingTop: "1rem",
+        }}
+      >
         <div>
-          <p className="text-sm text-gray-400 mb-1">Total Price</p>
-          <p className="text-2xl font-bold">
+          <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: 0 }}>Total Price</p>
+          <p style={{ fontSize: "1.6rem", fontWeight: 900, margin: "0.25rem 0 0 0" }}>
             ₹{(selectedSeats.length * seatPrice).toFixed(2)}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.25rem 0 0 0" }}>
             {selectedSeats.length} seat(s) selected
           </p>
         </div>
         <button
           onClick={handleConfirm}
           disabled={selectedSeats.length === 0}
-          className={`
-            px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-all
-            ${
-              selectedSeats.length > 0
-                ? "bg-blue-500 hover:bg-blue-400 text-white shadow-lg shadow-blue-500/30"
-                : "bg-slate-800 text-gray-500 cursor-not-allowed"
-            }
-          `}
+          className="primary-btn"
+          style={{
+            marginTop: 0,
+            width: "auto",
+            padding: "0.75rem 1.25rem",
+            background: selectedSeats.length ? "var(--accent-blue)" : "rgba(255,255,255,0.12)",
+            color: selectedSeats.length ? "#000" : "var(--text-muted)",
+            cursor: selectedSeats.length ? "pointer" : "not-allowed",
+          }}
         >
-          Book Now
-          <Check className="w-5 h-5" />
+          Book Now <Check size={18} />
         </button>
       </div>
     </div>

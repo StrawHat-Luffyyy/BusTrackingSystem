@@ -35,17 +35,20 @@ api.interceptors.response.use(
 export const authService = {
   login: (credentials) => api.post("/auth/login", credentials),
   signup: (userData) => api.post("/auth/signup", userData),
+  me: () => api.get("/auth/me"),
   logout: () => api.get("/auth/logout"),
 };
 
 export const tripService = {
   getLocations: () => api.get("/trips/locations"),
   searchTrips: (params) => api.get("/trips/search", { params }), // e.g., { origin: 'Ahmedabad' }
+  getTripSeats: (tripId) => api.get(`/trips/${tripId}/seats`),
 };
 
 export const bookingService = {
   createBooking: (data) => api.post("/bookings", data),
   getMyBookings: () => api.get("/bookings/my-bookings"),
+  cancelBooking: (bookingId) => api.patch(`/bookings/${bookingId}/cancel`),
 };
 
 export const adminService = {

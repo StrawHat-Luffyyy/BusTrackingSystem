@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Star, Eye, Sparkles, Smile, Sun, ArrowDown, MapPin, Calendar, Clock, Download } from "lucide-react";
 import { tripService, bookingService } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import SeatMap from "./SeatMap.jsx";
 
 const SearchHero = ({ auth }) => {
   const [locations, setLocations] = useState([]);
@@ -12,6 +13,10 @@ const SearchHero = ({ auth }) => {
   const [trips, setTrips] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [successModal, setSuccessModal] = useState(false);
+  const [seatModalOpen, setSeatModalOpen] = useState(false);
+  const [activeTrip, setActiveTrip] = useState(null);
+  const [seatInfo, setSeatInfo] = useState({ totalSeats: 0, bookedSeats: [] });
+  const [seatLoading, setSeatLoading] = useState(false);
   
   const navigate = useNavigate();
 
@@ -33,7 +38,7 @@ const SearchHero = ({ auth }) => {
     try {
       const res = await tripService.searchTrips({ origin, destination, date });
       if (res.data.status === "success") {
-        setTrips(res.data.data.trips);
+        setTrips(res.data.data.trips || []);
       }
     } catch (err) {
       console.error(err);
@@ -41,7 +46,7 @@ const SearchHero = ({ auth }) => {
     }
   };
 
-  const handleBook = async (tripId) => {
+  const openSeatModal = async (trip) => {
     if (!auth) {
       alert("Please log in to book a trip!");
       navigate("/login");
@@ -49,17 +54,43 @@ const SearchHero = ({ auth }) => {
     }
 
     try {
-      // In a broader iteration, we'd add seat selection UI. Defaulting to seat 1 for now.
-      const res = await bookingService.createBooking({ tripId, seatNumbers: "1" });
+      setSeatLoading(true);
+      setActiveTrip(trip);
+      setSeatModalOpen(true);
+      const res = await tripService.getTripSeats(trip.id);
+      setSeatInfo(res.data.data);
+    } catch (err) {
+      alert(err.response?.data?.message || "Booking failed");
+      setSeatModalOpen(false);
+      setActiveTrip(null);
+    } finally {
+      setSeatLoading(false);
+    }
+  };
+
+  const confirmSeatBooking = async (selectedSeats) => {
+    if (!activeTrip) return;
+    try {
+      const res = await bookingService.createBooking({
+        tripId: activeTrip.id,
+        seatNumbers: selectedSeats.join(","),
+      });
       if (res.data.status === "success") {
+        setSeatModalOpen(false);
+        setActiveTrip(null);
         setSuccessModal(true);
         setTimeout(() => {
           setSuccessModal(false);
-          navigate("/bookings"); // redirects them to their bookings page to see the new ticket
+          navigate("/bookings");
         }, 1500);
       }
     } catch (err) {
       alert(err.response?.data?.message || "Booking failed");
+      // Refresh seat availability in case another user booked meanwhile.
+      try {
+        const res = await tripService.getTripSeats(activeTrip.id);
+        setSeatInfo(res.data.data);
+      } catch {}
     }
   };
 
@@ -176,7 +207,7 @@ const SearchHero = ({ auth }) => {
                             ₹{trip.fare.toFixed(2)}
                           </p>
                         </div>
-                        <button onClick={() => handleBook(trip.id)} style={{ background: 'var(--text-main)', color: '#000' }}>
+                        <button onClick={() => openSeatModal(trip)} style={{ background: 'var(--text-main)', color: '#000' }}>
                           Book Ticket
                         </button>
                       </div>
@@ -186,6 +217,43 @@ const SearchHero = ({ auth }) => {
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {seatModalOpen && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999, padding: "1rem", backdropFilter: "blur(6px)" }}>
+          <div style={{ width: "100%", maxWidth: 720, background: "rgba(0,0,0,0.35)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 16, padding: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+              <div>
+                <div style={{ fontWeight: 900, fontSize: "1.1rem" }}>Choose your seat</div>
+                {activeTrip && (
+                  <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
+                    {activeTrip.route.origin} → {activeTrip.route.destination}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setSeatModalOpen(false);
+                  setActiveTrip(null);
+                }}
+                style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.12)", color: "var(--text-main)", padding: "0.5rem 0.75rem", borderRadius: 10, cursor: "pointer" }}
+              >
+                Close
+              </button>
+            </div>
+
+            {seatLoading ? (
+              <div style={{ color: "var(--text-muted)", padding: "2rem 0", textAlign: "center" }}>Loading seats...</div>
+            ) : (
+              <SeatMap
+                totalSeats={seatInfo.totalSeats}
+                bookedSeats={seatInfo.bookedSeats}
+                seatPrice={activeTrip?.fare || 0}
+                onConfirmBooking={confirmSeatBooking}
+              />
+            )}
+          </div>
         </div>
       )}
 

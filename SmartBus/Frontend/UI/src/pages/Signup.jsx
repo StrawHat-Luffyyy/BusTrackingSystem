@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { authService } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { Star, Eye, Sparkles, Smile, Sun } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
 
-const Signup = ({ setAuth }) => {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "COMMUTER" });
+const Signup = () => {
+  const { signup } = useAuth();
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await authService.signup(formData);
-      if (res.data.status === "success") {
-        setAuth(res.data.data.user);
-        navigate("/");
-      }
+      const user = await signup(formData);
+      if (user?.role === "ADMIN") navigate("/admin/dashboard");
+      else navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     }
@@ -61,17 +60,6 @@ const Signup = ({ setAuth }) => {
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
-        </div>
-
-        <div className="form-group" style={{ textAlign: "left" }}>
-          <label>I am a...</label>
-          <select
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          >
-            <option value="COMMUTER">Commuter</option>
-            <option value="OPERATOR">Operator</option>
-          </select>
         </div>
 
         <button type="submit" className="primary-btn" style={{ background: "var(--accent-blue)", color: "#000" }}>

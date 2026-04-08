@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import AdminDashBoard from './pages/AdminDashBoard';
 import MyBookings from './pages/MyBookings';
@@ -6,46 +5,26 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import SearchHero from './components/SearchHero';
 import UpcomingTrips from './components/UpcomingTrips';
-import { authService } from './services/api';
-
-const ProtectedAdminRoute = ({ auth, children }) => {
-  if (!auth) return <Navigate to="/login" replace />;
-  if (auth.role !== 'OPERATOR') return <Navigate to="/" replace />;
-  return children;
-};
+import { useAuth } from "./context/AuthContext.jsx";
+import RequireAuth from "./components/RequireAuth.jsx";
+import RequireAdmin from "./components/RequireAdmin.jsx";
 
 function AppContent() {
-  const [auth, setAuth] = useState(null);
+  const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
-
-  // On mount, check if there's auth in local storage
-  useEffect(() => {
-    const savedAuth = localStorage.getItem("auth");
-    if (savedAuth) {
-      setAuth(JSON.parse(savedAuth));
-    }
-  }, []);
-
-  // Sync auth state to local storage when changed
-  useEffect(() => {
-    if (auth) {
-      localStorage.setItem("auth", JSON.stringify(auth));
-    } else {
-      localStorage.removeItem("auth");
-    }
-  }, [auth]);
 
   const handleLogout = async () => {
     try {
-      await authService.logout();
-      setAuth(null);
+      await logout();
       navigate("/login");
     } catch (e) {
       console.error(e);
-      setAuth(null);
+      await logout();
       navigate("/login");
     }
   };
+
+  if (loading) return null;
 
   return (
     <div className="app-frame">
@@ -54,11 +33,11 @@ function AppContent() {
          <nav className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
             <Link to="/">Home</Link>
             <Link to="/bookings">Bookings</Link>
-            {auth?.role === 'OPERATOR' && <Link to="/admin">Admin</Link>}
+            {user?.role === 'ADMIN' && <Link to="/admin/dashboard">Admin</Link>}
             
-            {auth ? (
+            {user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '2rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Hi, {auth.name}</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Hi, {user.name}</span>
                 <button onClick={handleLogout} className="primary-btn" style={{ margin: 0, padding: '0.5rem 1rem', fontSize: '0.75rem', width: 'auto' }}>Logout</button>
               </div>
             ) : (
@@ -71,23 +50,31 @@ function AppContent() {
       </header>
       <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <Routes>
-          <Route path="/" element={
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={
             <>
-              <SearchHero auth={auth} />
-              <UpcomingTrips auth={auth} />
+              <SearchHero auth={user} />
+              <UpcomingTrips auth={user} />
             </>
           } />
           <Route 
-            path="/admin" 
+            path="/admin/dashboard" 
             element={
-              <ProtectedAdminRoute auth={auth}>
-                <AdminDashBoard />
-              </ProtectedAdminRoute>
+              <RequireAuth>
+                <RequireAdmin>
+                  <AdminDashBoard />
+                </RequireAdmin>
+              </RequireAuth>
             } 
           />
-          <Route path="/bookings" element={<MyBookings />} />
-          <Route path="/login" element={<Login setAuth={setAuth} />} />
-          <Route path="/signup" element={<Signup setAuth={setAuth} />} />
+          <Route path="/bookings" element={
+            <RequireAuth>
+              <MyBookings />
+            </RequireAuth>
+          } />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </main>
     </div>

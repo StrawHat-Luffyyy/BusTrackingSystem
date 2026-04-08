@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { tripService, bookingService } from '../services/api';
-import { Clock, Navigation } from 'lucide-react';
+import { Clock, Navigation, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const UpcomingTrips = ({ auth }) => {
   const [trips, setTrips] = useState([]);
+  const [successModal, setSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,12 +30,16 @@ const UpcomingTrips = ({ auth }) => {
       return;
     }
     try {
-      const res = await bookingService.createBooking({ tripId, seatNumbers: "1" });
+      const res = await bookingService.createBooking({ tripId, seatNumbers: "AUTO" });
       if (res.data.status === "success") {
-        window.location.href = "/bookings";
+        setSuccessModal(true);
+        setTimeout(() => {
+          setSuccessModal(false);
+          navigate("/bookings");
+        }, 1500);
       }
     } catch(err) {
-      console.log(err);
+      alert(err.response?.data?.message || "Booking failed");
     }
   }
 
@@ -64,6 +69,16 @@ const UpcomingTrips = ({ auth }) => {
            );
         })}
       </div>
+
+      {successModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: 'var(--bg-color)', padding: '3rem', borderRadius: '16px', border: '1px solid var(--accent-pink)', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', animation: 'scaleIn 0.3s ease-out', boxShadow: '0 0 40px rgba(235, 94, 255, 0.2)' }}>
+             <Sparkles size={48} color="var(--accent-pink)" />
+             <h2 style={{ color: 'var(--text-main)', margin: 0 }}>Ticket Booked!</h2>
+             <p style={{ color: 'var(--text-muted)' }}>Check it in the Bookings section.</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

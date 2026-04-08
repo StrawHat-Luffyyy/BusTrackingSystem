@@ -9,7 +9,14 @@ export const createBooking = catchAsync(async (req, res, next) => {
     return next(new AppError("Please provide tripId and seatNumbers.", 400));
   }
 
-  const requestedSeats = seatNumbers.split(",").map((s) => s.trim());
+  const rawSeatNumbers = String(seatNumbers).trim();
+  const isAutoSeatPick = rawSeatNumbers.toUpperCase() === "AUTO";
+  const requestedSeats = isAutoSeatPick
+    ? []
+    : rawSeatNumbers
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
 
   const booking = await prisma.$transaction(async (tx) => {
     const trip = await tx.trip.findUnique({
@@ -25,6 +32,18 @@ export const createBooking = catchAsync(async (req, res, next) => {
     const currentlyBookedSeats = trip.bookings.flatMap((b) =>
       b.seatNumbers.split(",").map((s) => s.trim()),
     );
+
+    // "Quick book" mode: backend selects the next available seat safely.
+    if (isAutoSeatPick) {
+      const allSeats = Array.from({ length: trip.bus.totalSeats }, (_, i) =>
+        String(i + 1),
+      );
+      const nextAvailable = allSeats.find((s) => !currentlyBookedSeats.includes(s));
+      if (!nextAvailable) {
+        throw new AppError("Not enough available seats on this bus.", 400);
+      }
+      requestedSeats.push(nextAvailable);
+    }
 
     const isDoubleBooked = requestedSeats.some((seat) =>
       currentlyBookedSeats.includes(seat),
@@ -78,5 +97,34 @@ export const getMyBookings = catchAsync(async (req, res, next) => {
     status: "success",
     results: bookings.length,
     data: { bookings },
+  });
+});
+
+export const cancelBooking = catchAsync(async (req, res, next) => {
+  const bookingId = Number(req.params.id);
+  if (!bookingId) {
+    return next(new AppError("Invalid booking id.", 400));
+  }
+
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+  });
+
+  if (!booking || booking.userId !== req.user.id) {
+    return next(new AppError("Booking not found.", 404));
+  }
+
+  if (booking.status === "CANCELLED") {
+    return res.status(200).json({ status: "success", data: { booking } });
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { status: "CANCELLED" },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: { booking: updated },
   });
 });
