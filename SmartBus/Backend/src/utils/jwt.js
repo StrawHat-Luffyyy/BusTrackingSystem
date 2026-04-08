@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const signToken = ({ id, role }) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
 export const sendTokenResponse = (user, statusCode, res) => {
-  const token = signToken(user.id);
+  const token = signToken({ id: user.id, role: user.role });
 
   const cookieOptions = {
     expires: new Date(

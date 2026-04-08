@@ -25,6 +25,12 @@ export const protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Role validation: token role must match the user's current role in DB.
+  // This prevents stale/forged tokens from bypassing role checks.
+  if (decoded.role && decoded.role !== currentUser.role) {
+    return next(new AppError("Invalid token role for current user.", 401));
+  }
+
   req.user = currentUser;
   next();
 });

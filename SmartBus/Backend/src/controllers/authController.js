@@ -11,6 +11,11 @@ export const signup = catchAsync(async (req, res, next) => {
     return next(new AppError("Please provide name, email, and password!", 400));
   }
 
+  // Prevent privilege escalation via self-assigned roles.
+  if (role && role !== "COMMUTER") {
+    return next(new AppError("Role cannot be set during signup.", 403));
+  }
+
   const saltRounds = 12;
   const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -19,7 +24,7 @@ export const signup = catchAsync(async (req, res, next) => {
       name,
       email,
       passwordHash,
-      role: role || "COMMUTER",
+      role: "COMMUTER",
     },
   });
 
